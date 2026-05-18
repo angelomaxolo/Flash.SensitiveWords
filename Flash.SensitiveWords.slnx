@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Flash.SensitiveWords.API/Flash.SensitiveWords.API.csproj" />
+    <Project Path="src/Flash.SensitiveWords.Application/Flash.SensitiveWords.Application.csproj" />
+    <Project Path="src/Flash.SensitiveWords.Domain/Flash.SensitiveWords.Domain.csproj" />
+    <Project Path="src/Flash.SensitiveWords.Infrastructure/Flash.SensitiveWords.Infrastructure.csproj" />
+    <Project Path="src/Flash.SensitiveWords.RestClient/Flash.SensitiveWords.RestClient.csproj" />
+    <Project Path="src/Flash.SensitiveWords.Web/Flash.SensitiveWords.Web.csproj" />
+  </Folder>
+</Solution>
