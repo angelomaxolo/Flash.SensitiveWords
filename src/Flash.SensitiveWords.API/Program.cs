@@ -1,41 +1,49 @@
-var builder = WebApplication.CreateBuilder(args);
+using Flash.SensitiveWords.API.Endpoints;
+using Flash.SensitiveWords.Application.Services;
+using Flash.SensitiveWords.Infrastructure.Extensions;
+using Flash.SensitiveWords.Infrastructure.Seeding;
+using System.Reflection;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var builder = WebApplication.CreateBuilder(args);
+ConfigureServices(builder);
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+await InitializeDatabaseAsync(app);
+ConfigurePipeline(app);
+MapEndpoints(app);
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+static void ConfigureServices(WebApplicationBuilder builder)
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(options =>
+    {
+        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlFilePath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+        options.IncludeXmlComments(xmlFilePath, includeControllerXmlComments: true);
+    });
+}
+
+static async Task InitializeDatabaseAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var initializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+    await initializer.InitializeAsync();
+}
+
+static void ConfigurePipeline(WebApplication app)
+{
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+}
+
+static void MapEndpoints(WebApplication app)
+{
+    app.MapSensitiveWordsEndpoints();
 }
