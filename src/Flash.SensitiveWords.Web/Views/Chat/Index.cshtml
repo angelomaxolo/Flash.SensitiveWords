@@ -1,0 +1,52 @@
+﻿@model Flash.SensitiveWords.Web.ViewModels.ChatViewModel
+
+<div class="container mt-5" style="max-width: 800px;">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Sensitive Words Chat Filter</h2>
+        <p class="text-muted">Type a message and see real-time filtering in action</p>
+    </div>
+
+    <!-- Input Card -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+
+            <form method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Your Message</label>
+                    <textarea name="Message"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Type your message here...">@Model.Message</textarea>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        Send Message
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Output Card -->
+    @if (!string.IsNullOrEmpty(Model.FilteredMessage))
+    {
+        <div class="card shadow-sm border-success">
+            <div class="card-header bg-success text-white">
+                Filtered Output
+            </div>
+
+            <div class="card-body">
+                <p class="mb-0 fs-5">
+                    @Model.FilteredMessage
+                </p>
+            </div>
+        </div>
+    }
+
+</div>
