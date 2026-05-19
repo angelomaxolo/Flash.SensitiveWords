@@ -1,5 +1,5 @@
 using Flash.SensitiveWords.API.Endpoints;
-using Flash.SensitiveWords.Application.Services;
+using Flash.SensitiveWords.Application.Extensions;
 using Flash.SensitiveWords.Infrastructure.Extensions;
 using Flash.SensitiveWords.Infrastructure.Seeding;
 using System.Reflection;
@@ -16,6 +16,7 @@ app.Run();
 static void ConfigureServices(WebApplicationBuilder builder)
 {
     builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddApplicationServices();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>
     {

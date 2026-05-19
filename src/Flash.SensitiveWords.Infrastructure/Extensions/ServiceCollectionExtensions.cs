@@ -1,4 +1,3 @@
-using Flash.SensitiveWords.Application.Services;
 using Flash.SensitiveWords.Domain.Repositories;
 using Flash.SensitiveWords.Infrastructure.Data;
 using Flash.SensitiveWords.Infrastructure.Repositories;
@@ -19,7 +18,6 @@ public static class ServiceCollectionExtensions
             options.UseSqlServer(connectionString));
 
         services.AddScoped<ISensitiveWordRepository, SensitiveWordRepository>();
-        services.AddScoped<ISensitiveWordService, SensitiveWordService>();
         services.AddScoped<IDbInitializer, DbInitializer>();
 
         return services;
