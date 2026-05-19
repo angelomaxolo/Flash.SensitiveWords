@@ -1,29 +1,37 @@
+using Flash.SensitiveWords.RestClient.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services
 builder.Services.AddControllersWithViews();
+
+// RestClient registration
+builder.Services.AddRestClient(
+    builder.Configuration["ApiSettings:BaseUrl"]!);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Error handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+// Required for CSS/JS/images
+app.UseStaticFiles();
+
 app.UseRouting();
 
+// Future-proof (admin section)
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
+// MVC routing
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Chat}/{action=Index}/{id?}");
 
 app.Run();

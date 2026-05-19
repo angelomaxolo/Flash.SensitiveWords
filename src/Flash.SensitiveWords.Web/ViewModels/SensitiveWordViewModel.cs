@@ -1,6 +1,6 @@
-﻿namespace Flash.SensitiveWords.Contracts.Requests
+﻿namespace Flash.SensitiveWords.Web.ViewModels
 {
-    public class UpdateSensitiveWordRequest
+    public class SensitiveWordViewModel
     {
         public Guid Id { get; set; }
         public string Word { get; set; } = string.Empty;
