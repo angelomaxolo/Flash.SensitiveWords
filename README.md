@@ -1,6 +1,6 @@
 # Flash.SensitiveWords
 
-Flash.SensitiveWords is a cleanly layered solution for sensitive word management and message filtering. It is implemented with ASP.NET Core, MSSQL, Swagger, and a thin MVC frontend that consumes the API through a dedicated REST client.
+Flash.SensitiveWords is a cleanly layered solution for sensitive word management and message filtering. It is implemented with ASP.NET Core 10, MSSQL, Swagger, and a thin MVC frontend that consumes the API through a dedicated REST client.
 
 ## What this solution delivers
 
