@@ -1,0 +1,147 @@
+﻿@model List<Flash.SensitiveWords.Web.ViewModels.SensitiveWordViewModel>
+
+<div class="container mt-5">
+
+    <div class="d-flex align-items-center mb-3">
+        <h2 class="fw-bold mb-0">Sensitive Words Admin</h2>
+
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <form method="post" asp-controller="Account" asp-action="Logout" class="ms-auto">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+            </form>
+        }
+    </div>
+
+    <!-- ALERTS -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" id="errorAlert">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" id="successAlert">
+            @TempData["Success"]
+        </div>
+    }
+
+    <div id="notificationContainer"></div>
+
+    <!-- CREATE FORM -->
+    <div class="card mb-3">
+        <div class="card-body">
+
+            <form id="createForm">
+
+                <div class="row g-2">
+
+                    <div class="col-md-9">
+                        <input id="wordInput"
+                               name="word"
+                               class="form-control"
+                               placeholder="Enter word..." />
+
+                        <small id="wordError" class="text-danger d-none">
+                            Cannot be empty
+                        </small>
+                    </div>
+
+                    <div class="col-md-3 d-grid">
+                        <button class="btn btn-primary">
+                            Add Word
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+
+        <div class="card-header bg-dark text-white">
+            Words List
+        </div>
+        <br />
+        <div class="card-body p-0">
+
+            <table id="wordsTable" class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Word</th>
+                        <th style="width:120px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+
+                            <td>
+                                <span class="badge bg-secondary">@item.Word</span>
+                            </td>
+
+                            <td>
+                                <button class="btn btn-sm btn-warning edit-btn"
+                                        data-id="@item.Id"
+                                        data-word="@item.Word">
+                                    Edit
+                                </button>
+
+                                <button class="btn btn-danger btn-sm delete-btn"
+                                        data-id="@item.Id">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+<!-- MODAL -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Word</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="editId" />
+
+                <div class="mb-3">
+                    <label>Word</label>
+                    <input type="text" id="editWord" class="form-control" />
+                </div>
+
+                <small id="editError" class="text-danger d-none">
+                    Word cannot be empty
+                </small>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="saveEditBtn">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
