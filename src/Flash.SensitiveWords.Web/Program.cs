@@ -6,9 +6,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddControllersWithViews();
 
-// RestClient registration
-builder.Services.AddRestClient(
-    builder.Configuration["ApiSettings:BaseUrl"]!);
+// Authentication (cookie-based) for admin UI
+builder.Services.AddAuthentication("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/account/login";
+        options.LogoutPath = "/account/logout";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+    });
+
+// RestClient registration (will include API key header if configured)
+builder.Services.AddRestClient(builder.Configuration);
 
 var app = builder.Build();
 

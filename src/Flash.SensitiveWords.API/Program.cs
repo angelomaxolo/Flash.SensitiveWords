@@ -4,6 +4,7 @@ using Flash.SensitiveWords.Application.Extensions;
 using Flash.SensitiveWords.Infrastructure.Extensions;
 using Flash.SensitiveWords.Infrastructure.Seeding;
 using System.Reflection;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder);
@@ -24,6 +25,22 @@ static void ConfigureServices(WebApplicationBuilder builder)
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlFilePath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
         options.IncludeXmlComments(xmlFilePath, includeControllerXmlComments: true);
+
+        options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+        {
+            Description = "API Key needed to access the endpoints. Add in header 'X-Api-Key'.",
+            Name = "X-Api-Key",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "ApiKeyScheme"
+        });
+
+        options.AddSecurityRequirement(document =>
+        {
+            var requirement = new OpenApiSecurityRequirement();
+            requirement.Add(new OpenApiSecuritySchemeReference("ApiKey", document, null), new List<string>());
+            return requirement;
+        });
     });
 }
 
@@ -41,6 +58,8 @@ static void ConfigurePipeline(WebApplication app)
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+    // API key protection for internal endpoints
+    app.UseMiddleware<ApiKeyMiddleware>();
 
     app.UseRequestLogging();
     app.UseHttpsRedirection();

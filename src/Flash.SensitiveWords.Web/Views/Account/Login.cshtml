@@ -1,0 +1,56 @@
+@{
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Admin Login</h5>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            @foreach (var error in modelState.Errors)
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        }
+                    </div>
+                }
+
+                <form method="post" asp-controller="Account" asp-action="Login" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input name="username" class="form-control @(ViewData.ModelState.ContainsKey("username") && ViewData.ModelState["username"].Errors.Count > 0 ? "is-invalid" : "")" required />
+                        @if (ViewData.ModelState.ContainsKey("username"))
+                        {
+                            <div class="invalid-feedback d-block">
+                                @foreach (var error in ViewData.ModelState["username"].Errors)
+                                {
+                                    <span>@error.ErrorMessage</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input name="password" type="password" class="form-control @(ViewData.ModelState.ContainsKey("password") && ViewData.ModelState["password"].Errors.Count > 0 ? "is-invalid" : "")" required />
+                        @if (ViewData.ModelState.ContainsKey("password"))
+                        {
+                            <div class="invalid-feedback d-block">
+                                @foreach (var error in ViewData.ModelState["password"].Errors)
+                                {
+                                    <span>@error.ErrorMessage</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Sign in</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
