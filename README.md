@@ -15,6 +15,7 @@ Flash.SensitiveWords is a cleanly layered solution for sensitive word management
 
 - `src/Flash.SensitiveWords.API` - API host and minimal endpoint definitions
 - `src/Flash.SensitiveWords.Application` - business rules and service layer
+- `src/Flash.SensitiveWords.Contracts` - shared DTOs, request/response models used by API and REST client
 - `src/Flash.SensitiveWords.Domain` - domain entities and repository contracts
 - `src/Flash.SensitiveWords.Infrastructure` - EF Core data access, SQL Server wiring, and database initialization
 - `src/Flash.SensitiveWords.RestClient` - typed HTTP client wrappers for API consumption
