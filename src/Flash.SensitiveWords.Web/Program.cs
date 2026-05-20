@@ -2,7 +2,8 @@ using Flash.SensitiveWords.RestClient.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+// AppInsights and application services
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddControllersWithViews();
 
 // RestClient registration
