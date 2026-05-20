@@ -2,7 +2,16 @@
 
 <div class="container mt-5">
 
-    <h2 class="fw-bold mb-3">Sensitive Words Admin</h2>
+    <div class="d-flex align-items-center mb-3">
+        <h2 class="fw-bold mb-0">Sensitive Words Admin</h2>
+
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <form method="post" asp-controller="Account" asp-action="Logout" class="ms-auto">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+            </form>
+        }
+    </div>
 
     <!-- ALERTS -->
     @if (TempData["Error"] != null)

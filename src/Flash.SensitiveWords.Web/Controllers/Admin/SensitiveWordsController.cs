@@ -3,12 +3,14 @@ using Flash.SensitiveWords.Contracts.Requests;
 using Flash.SensitiveWords.Contracts.Responses;
 using Flash.SensitiveWords.RestClient.Abstractions;
 using Flash.SensitiveWords.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Flash.SensitiveWords.Web.Controllers.Admin;
 
 [Route("sensitivewords")]
+[Authorize]
 public class SensitiveWordsController : Controller
 {
     private readonly ISensitiveWordsClient _client;
