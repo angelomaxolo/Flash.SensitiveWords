@@ -1,4 +1,5 @@
 using Flash.SensitiveWords.API.Endpoints;
+using Flash.SensitiveWords.API.Middleware;
 using Flash.SensitiveWords.Application.Extensions;
 using Flash.SensitiveWords.Infrastructure.Extensions;
 using Flash.SensitiveWords.Infrastructure.Seeding;
@@ -41,6 +42,7 @@ static void ConfigurePipeline(WebApplication app)
         app.UseSwaggerUI();
     }
 
+    app.UseRequestLogging();
     app.UseHttpsRedirection();
 }
 

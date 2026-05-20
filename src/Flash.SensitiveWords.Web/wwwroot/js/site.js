@@ -17,6 +17,7 @@ $(document).ready(function () {
 
         if (!word) {
             $("#wordError").removeClass("d-none");
+            showAlert("danger", "Please enter a word before adding.");
             return;
         }
 
@@ -27,15 +28,22 @@ $(document).ready(function () {
             type: "POST",
             data: { word: word },
             success: function (res) {
+                if (!res || !res.id) {
+                    showAlert("danger", "Unable to add the sensitive word. Please try again.");
+                    return;
+                }
 
                 table.row.add([
                     res.id,
                     `<span class="badge bg-secondary">${escapeHtml(res.word)}</span>`,
-                    `<button class="btn btn-warning btn-sm edit-btn" data-id="${res.id}" data-word="${escapeHtml(res.word)}">Edit</button>`
-                    `<button class="btn btn-danger btn-sm delete-btn" data-id="${res.id}">Delete</button>`
+                    `<button class="btn btn-warning btn-sm edit-btn me-1" data-id="${res.id}" data-word="${escapeHtml(res.word)}">Edit</button><button class="btn btn-danger btn-sm delete-btn" data-id="${res.id}">Delete</button>`
                 ]).draw(false);
 
                 $("#wordInput").val("");
+                showAlert("success", "Sensitive word added successfully.");
+            },
+            error: function () {
+                showAlert("danger", "Unable to add the sensitive word. Please try again.");
             }
         });
     });
@@ -45,43 +53,25 @@ $(document).ready(function () {
 
         const id = $(this).data("id");
         const row = $(this).closest("tr");
+        const dtRow = table.row(row);
 
         $.ajax({
             url: "/SensitiveWords/Delete/" + id,
             type: "GET",
             success: function () {
-
                 row.css("background-color", "#ffdddd");
-
                 row.fadeOut(300, function () {
-                    table.row(row).remove().draw(false);
+                    dtRow.remove().draw(false);
+                    showAlert("success", "Sensitive word deleted successfully.");
                 });
+            },
+            error: function () {
+                showAlert("warning", "Unable to delete the sensitive word. Please try again.");
             }
         });
     });
 
 });
-
-$(document).on("click", ".delete-btn", function () {
-
-    const id = $(this).data("id");
-
-    const row = $(this).closest("tr");
-
-    $.ajax({
-        url: "/SensitiveWords/Delete/" + id,
-        type: "GET",
-        success: function () {
-
-            row.fadeOut(200, function () {
-                $('#wordsTable').DataTable().row(row).remove().draw(false);
-            });
-
-        }
-    });
-
-});
-
 
 let editModal = new bootstrap.Modal(document.getElementById('editModal'));
 
@@ -119,7 +109,6 @@ $("#saveEditBtn").click(function () {
     contentType: "application/json",
         data: JSON.stringify(sensitiveWordDto),
         success: function () {
-
             // update table row live
             let row = $(".edit-btn[data-id='" + id + "']").closest("tr");
 
@@ -130,10 +119,42 @@ $("#saveEditBtn").click(function () {
 
             // close modal
             editModal.hide();
+            showAlert("success", "Sensitive word updated successfully.");
+        },
+        error: function () {
+            showAlert("danger", "Unable to update the sensitive word. Please try again.");
         }
     });
 
 });
+
+// ALERT HELPERS
+function showAlert(type, message) {
+    const alertId = `alert-${Date.now()}`;
+    const alertMarkup = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${escapeHtml(message)}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+
+    const container = $("#notificationContainer");
+
+    if (container.length === 0) {
+        return;
+    }
+
+    container.append(alertMarkup);
+
+    setTimeout(function () {
+        const alertElement = $(`#${alertId}`);
+        if (alertElement.length) {
+            alertElement.fadeOut(200, function () {
+                $(this).remove();
+            });
+        }
+    }, 4500);
+}
 
 // SAFE HTML ESCAPE (IMPORTANT)
 function escapeHtml(text) {

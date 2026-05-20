@@ -5,6 +5,8 @@ using Flash.SensitiveWords.Contracts.Requests;
 using Flash.SensitiveWords.Contracts.Responses;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Flash.SensitiveWords.API.Endpoints;
 
@@ -74,8 +76,11 @@ public static class SensitiveWordsEndpoints
             .Produces<ApiResponse<ErrorResponse>>(StatusCodes.Status500InternalServerError);
     }
 
-    private static async Task<IResult> GetAllSensitiveWords(ISensitiveWordService service, CancellationToken cancellationToken)
+    private static async Task<IResult> GetAllSensitiveWords(ISensitiveWordService service, [FromServices] ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
+        var logger = loggerFactory.CreateLogger("SensitiveWordsEndpoints");
+        logger.LogInformation("Received request to retrieve all sensitive words.");
+
         try
         {
             var words = await service.GetAllAsync(cancellationToken);
@@ -86,16 +91,21 @@ public static class SensitiveWordsEndpoints
                 Message = "Sensitive words retrieved successfully",
                 Result = dtos
             };
+            logger.LogInformation("Returning {Count} sensitive words.", dtos.Count);
             return Results.Ok(response);
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error retrieving sensitive words.");
             return HandleException(ex, "Error retrieving sensitive words");
         }
     }
 
-    private static async Task<IResult> GetSensitiveWordById(Guid id, ISensitiveWordService service, CancellationToken cancellationToken)
+    private static async Task<IResult> GetSensitiveWordById(Guid id, ISensitiveWordService service, [FromServices] ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
+        var logger = loggerFactory.CreateLogger("SensitiveWordsEndpoints");
+        logger.LogInformation("Received request to retrieve sensitive word by Id={Id}.", id);
+
         try
         {
             var word = await service.GetByIdAsync(id, cancellationToken);
@@ -110,16 +120,21 @@ public static class SensitiveWordsEndpoints
         }
         catch (SensitiveWordNotFoundException)
         {
+            logger.LogWarning("Sensitive word Id={Id} not found.", id);
             return NotFoundError($"Sensitive word with ID '{id}' not found");
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error retrieving sensitive word Id={Id}.", id);
             return HandleException(ex, "Error retrieving sensitive word");
         }
     }
 
-    private static async Task<IResult> CreateSensitiveWord(CreateSensitiveWordRequest request, ISensitiveWordService service, CancellationToken cancellationToken)
+    private static async Task<IResult> CreateSensitiveWord(CreateSensitiveWordRequest request, ISensitiveWordService service, [FromServices] ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
+        var logger = loggerFactory.CreateLogger("SensitiveWordsEndpoints");
+        logger.LogInformation("Received request to create sensitive word.");
+
         try
         {
             var result = await service.AddAsync(request.Word, cancellationToken);
@@ -134,20 +149,26 @@ public static class SensitiveWordsEndpoints
         }
         catch (ArgumentException ex)
         {
+            logger.LogWarning(ex, "Invalid create request for sensitive word.");
             return BadRequestError(ex.Message);
         }
         catch (SensitiveWordAlreadyExistsException ex)
         {
+            logger.LogWarning(ex, "Duplicate sensitive word create attempt.");
             return BadRequestError(ex.Message);
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error creating sensitive word.");
             return HandleException(ex, "Error creating sensitive word");
         }
     }
 
-    private static async Task<IResult> UpdateSensitiveWord(Guid id, UpdateSensitiveWordRequest request, ISensitiveWordService service, CancellationToken cancellationToken)
+    private static async Task<IResult> UpdateSensitiveWord(Guid id, UpdateSensitiveWordRequest request, ISensitiveWordService service, [FromServices] ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
+        var logger = loggerFactory.CreateLogger("SensitiveWordsEndpoints");
+        logger.LogInformation("Received request to update sensitive word Id={Id}.", id);
+
         try
         {
             var result = await service.UpdateAsync(id, request.Word, cancellationToken);
@@ -162,24 +183,31 @@ public static class SensitiveWordsEndpoints
         }
         catch (ArgumentException ex)
         {
+            logger.LogWarning(ex, "Invalid update request for sensitive word Id={Id}.", id);
             return BadRequestError(ex.Message);
         }
         catch (SensitiveWordNotFoundException)
         {
+            logger.LogWarning("Sensitive word Id={Id} not found for update.", id);
             return NotFoundError($"Sensitive word with ID '{id}' not found");
         }
         catch (SensitiveWordAlreadyExistsException ex)
         {
+            logger.LogWarning(ex, "Duplicate sensitive word update attempt for Id={Id}.", id);
             return BadRequestError(ex.Message);
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error updating sensitive word Id={Id}.", id);
             return HandleException(ex, "Error updating sensitive word");
         }
     }
 
-    private static async Task<IResult> DeleteSensitiveWord(Guid id, ISensitiveWordService service, CancellationToken cancellationToken)
+    private static async Task<IResult> DeleteSensitiveWord(Guid id, ISensitiveWordService service, [FromServices] ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
+        var logger = loggerFactory.CreateLogger("SensitiveWordsEndpoints");
+        logger.LogInformation("Received request to delete sensitive word Id={Id}.", id);
+
         try
         {
             await service.DeleteAsync(id, cancellationToken);
@@ -187,19 +215,24 @@ public static class SensitiveWordsEndpoints
         }
         catch (SensitiveWordNotFoundException)
         {
+            logger.LogWarning("Sensitive word Id={Id} not found for deletion.", id);
             return NotFoundError($"Sensitive word with ID '{id}' not found");
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error deleting sensitive word Id={Id}.", id);
             return HandleException(ex, "Error deleting sensitive word");
         }
     }
 
-    private static async Task<IResult> FilterMessage(FilterMessageRequest request, ISensitiveWordService service, CancellationToken cancellationToken)
+    private static async Task<IResult> FilterMessage(FilterMessageRequest request, ISensitiveWordService service, [FromServices] ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
+        var logger = loggerFactory.CreateLogger("SensitiveWordsEndpoints");
+        logger.LogInformation("Received filter request for a message of length {Length}.", request.Message?.Length ?? 0);
+
         try
         {
-            var filterResult = await service.FilterMessageAsync(request.Message, cancellationToken);
+            var filterResult = await service.FilterMessageAsync(request.Message ?? string.Empty, cancellationToken);
             var filterResponse = new FilterMessageResponse
             {
                 OriginalMessage = filterResult.OriginalMessage,
@@ -215,10 +248,12 @@ public static class SensitiveWordsEndpoints
         }
         catch (ArgumentException ex)
         {
+            logger.LogWarning(ex, "Filter request validation failed.");
             return BadRequestError(ex.Message);
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error filtering message.");
             return HandleException(ex, "Error filtering message");
         }
     }
